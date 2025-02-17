@@ -34,7 +34,7 @@ export default function RootLayout({
           <Providers>
             <SidebarTrigger className="w-14 h-14" />
             <main className="flex-1 flex-col items-center justify-center shadow-xl">
-              <div className="flex min-h-screen flex-col items-center justify-center shadow-xl">
+              <div className="flex flex-col items-center justify-center shadow-xl ">
                 <SearchBar />
                 {children}
               </div>
