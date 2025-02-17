@@ -1,0 +1,13 @@
+{
+  "menu": {
+    "title": "석청의 게으름과 욕망의 게시판",
+    "home": "home",
+    "stock": "stock",
+    "admin": "admin"
+  },
+  "link": {
+    "home": "./",
+    "stock": "./stock",
+    "admin": "./admin"
+  }
+}
