@@ -1,4 +1,4 @@
-import MainTable from "@/components/main-table";
+import MainTable from "@/components/stock-table";
 import { Button } from "@workspace/ui/components/button";
 import { main } from "@config/main.json";
 
@@ -8,7 +8,6 @@ export default function Page() {
       <div className="flex flex-col items-center justify-center gap-4">
         <h1 className="text-2xl font-bold mt-5">{main.tableName}</h1>
       </div>
-      <MainTable />
     </div>
   );
 }
