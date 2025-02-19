@@ -3,11 +3,18 @@
     "title": "석청의 게으름과 욕망의 게시판",
     "home": "home",
     "stock": "stock",
-    "admin": "admin"
+    "admin": "석청의 음습한 관음 게시판",
+    "user": "user",
+    "log": "log"
   },
   "link": {
-    "home": "./",
-    "stock": "./stock",
-    "admin": "./admin"
+    "home": "/",
+    "stock": "/stock",
+    "admin": {
+      "home": "/admin/",
+      "stock": "/admin/stock",
+      "user": "/admin/user",
+      "log": "/admin/log"
+    }
   }
 }

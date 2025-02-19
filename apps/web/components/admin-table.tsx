@@ -12,37 +12,36 @@ import {
 } from "@workspace/ui/components/table";
 import { FlaskConicalOff } from "lucide-react";
 import Image from "next/image";
-import stock from "@config/stock.json";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
 
-export default function ShortfallTable() {
+export default function AdminTable() {
+  const router = useRouter();
   return (
     <div className="m-5 relative w-100">
       <Table className="table-fixed">
         <TableHeader>
           <TableRow>
+            <TableHead className="">image</TableHead>
             <TableHead className="">Name</TableHead>
             <TableHead>Amount</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
-          <TableRow>
-            <TableCell>
-              <div>sdsd</div>
-              <div></div>
+          <TableRow
+            onClick={() => {
+              router.push("/admin/stock/12");
+            }}
+          >
+            <TableCell className="font-medium">
+              <FlaskConicalOff className="stroke-muted" size={"100"} />
             </TableCell>
-            <TableCell className="flex-row">
-              <div className="mr-5">5</div>
-              <Badge className="bg-red-600">{stock.status.bad}</Badge>
-            </TableCell>
-          </TableRow>
-          <TableRow>
             <TableCell>
               <div>price</div>
-              <div></div>
+              <Badge className="bg-green-600">:)</Badge>
             </TableCell>
             <TableCell className="flex-row">
-              <div className="mr-5">5</div>
-              <Badge className="bg-slate-600">{stock.status.normal}</Badge>
+              <div>5</div> {/** 이 쪽 라인 */}
             </TableCell>
           </TableRow>
         </TableBody>

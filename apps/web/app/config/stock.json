@@ -1,5 +1,10 @@
 {
   "table": {
     "name": "재고"
+  },
+  "status": {
+    "good": ":)",
+    "normal": ":0",
+    "bad": ":("
   }
 }
