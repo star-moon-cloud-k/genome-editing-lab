@@ -15,8 +15,10 @@ interface Identifiable {
 
 export default function BasicTable<T extends Identifiable>({
   params,
+  route,
 }: {
   params: T[];
+  route: string;
 }) {
   const router = useRouter();
 
@@ -37,7 +39,7 @@ export default function BasicTable<T extends Identifiable>({
           {params.map((cellData) => (
             <TableRow
               key={cellData.id} // ✅ key 추가
-              onClick={() => router.push(`user/${cellData.id}`)}
+              onClick={() => router.push(`${route}/${cellData.id}`)}
             >
               {tableHeaders.map((key) => (
                 <TableCell key={key}>
