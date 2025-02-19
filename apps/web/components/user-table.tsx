@@ -39,7 +39,9 @@ export default function BasicTable<T extends Identifiable>({
           {params.map((cellData) => (
             <TableRow
               key={cellData.id} // ✅ key 추가
-              onClick={() => router.push(`${route}/${cellData.id}`)}
+              onClick={() =>
+                route ? router.push(`${route}/${cellData.id}`) : null
+              }
             >
               {tableHeaders.map((key) => (
                 <TableCell key={key}>

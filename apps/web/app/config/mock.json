@@ -60,5 +60,10 @@
       "number": 10,
       "timestamp": "Wed Feb 19 2025 14:18:31stock"
     }
-  ]
+  ],
+  "userInfo": {
+    "id": 1,
+    "name": "석청",
+    "lastLogin": "Wed Feb 19 2025 14:18:31stock"
+  }
 }

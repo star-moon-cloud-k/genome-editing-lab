@@ -1,12 +1,13 @@
+import BasicTable from "@/components/user-table";
 import { Button } from "@workspace/ui/components/button";
-
+import { log } from "@config/mock.json";
+import { UserCard } from "@/components/user-card";
 export default function detailPage({ params }: { params: { id: string } }) {
-  console.log(params.id);
   return (
     <div className="basic_page">
       <div className="basic_contents">
-        <h1 className="text-2xl font-bold">{params.id}</h1>
-        <Button size="sm">Button</Button>
+        <UserCard />
+        <BasicTable params={log} route={""} />
       </div>
     </div>
   );
