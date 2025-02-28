@@ -1,4 +1,4 @@
-import AdminTable from "@/components/admin-table";
+import AdminTable from "@/app/admin/stock/admin-table";
 import { Button } from "@workspace/ui/components/button";
 
 export default function StockPage() {

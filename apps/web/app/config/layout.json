@@ -1,0 +1,61 @@
+{
+  "main": {
+    "tableName": "재고 부족분"
+  },
+  "admin": {
+    "stockPage": {
+      "title": "title"
+    }
+  },
+  "login": {
+    "title": "로그인",
+    "description": "소개를 안시켜주면 끝까지 안풀어줌 :)",
+    "id": "학번",
+    "password": "비밀번호",
+    "login": "로그인",
+    "register": "학번 등록"
+  },
+  "register": {
+    "title": "회원가입",
+    "description": "계정은 학번으로 사용해주세요",
+    "labName": "연구실",
+    "placeHolder": "연구실을 선택해주세요",
+    "id": "학번",
+    "verify": "계정 확인",
+    "password": "비밀번호",
+    "passwordCheck": "한번 더 :)",
+    "register": "등록하기"
+  },
+  "contact": {
+    "Email": "kspecial44@gmail.com",
+    "description": "문제 발생 시, 연구실의 admin 계정 담당자, 혹은 개발자에게 문의 주세요"
+  },
+  "menu": {
+    "title": "석청의 게으름과 욕망의 게시판",
+    "home": "home",
+    "stock": "stock",
+    "admin": "석청의 음습한 관음 게시판",
+    "user": "user",
+    "log": "log"
+  },
+  "link": {
+    "home": "/",
+    "stock": "/stock",
+    "admin": {
+      "home": "/admin/",
+      "stock": "/admin/stock",
+      "user": "/admin/user",
+      "log": "/admin/log"
+    }
+  },
+  "stock": {
+    "table": {
+      "name": "재고"
+    },
+    "status": {
+      "good": ":)",
+      "normal": ":0",
+      "bad": ":("
+    }
+  }
+}

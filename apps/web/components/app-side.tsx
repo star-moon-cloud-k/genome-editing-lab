@@ -1,6 +1,6 @@
 "use client";
 
-import menuData from "@config/menu.json";
+import menuData from "@config/layout.json";
 import { Button } from "@workspace/ui/components/button";
 import { Separator } from "@workspace/ui/components/separator";
 import {
