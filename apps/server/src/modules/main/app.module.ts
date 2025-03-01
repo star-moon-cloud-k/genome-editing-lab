@@ -1,27 +1,23 @@
 import { Module } from '@nestjs/common';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
 import { ConfigModule } from '@nestjs/config';
-import { PostModule } from '../post/post.module';
-import { DrizzleModule } from '@root/drizzle/drizzle.module';
-import { CommonModule } from '../../common/common.module';
-import { AuthModule } from '../auth/auth.module';
-import { UserModule } from '../user/user.module';
 import { ServeStaticModule } from '@nestjs/serve-static';
-import { PUBLIC_FOLDER_NAME } from '@root/common/const/path.const';
-import { ImageMangeModule } from '@root/common/images/image-storage-local.module';
 import {
   PUBLIC_FOLDER_PATH,
   TEMP_FOLDER_PATH,
 } from '@root/common/const/path.const';
+import { ImageMangeModule } from '@root/common/images/image-storage-local.module';
+import { DrizzleModule } from '@root/drizzle/drizzle.module';
 import { CustomLogger } from '@root/utils/logger/logger.service';
 import { WinstonModule } from 'nest-winston';
 import * as winston from 'winston';
-import * as winstonDaily from 'winston-daily-rotate-file';
-import * as moment from 'moment-timezone';
-import { join } from 'path';
-import { NewsModule } from '../news/news.module';
+import DailyRotateFile from 'winston-daily-rotate-file';
+import { CommonModule } from '../../common/common.module';
+import { AuthModule } from '../auth/auth.module';
+import { UserModule } from '../user/user.module';
+import { AppController } from './app.controller';
+import { AppService } from './app.service';
 import { ScheduleModule } from '@nestjs/schedule';
+import { join } from 'path';
 
 const env = process.env.NODE_ENV || 'development';
 
@@ -33,70 +29,36 @@ const env = process.env.NODE_ENV || 'development';
     }),
     ServeStaticModule.forRoot(
       {
-        rootPath: PUBLIC_FOLDER_PATH, // {root}/images/public
-        serveRoot: '/images/public', // 클라이언트가 접근할 URL 경로
+        rootPath: PUBLIC_FOLDER_PATH,
+        serveRoot: '/images/public',
       },
       {
-        rootPath: TEMP_FOLDER_PATH, // {root}/images/temp
-        serveRoot: '/images/temp', // 클라이언트가 접근할 URL 경로
+        rootPath: TEMP_FOLDER_PATH,
+        serveRoot: '/images/temp',
       },
     ),
     WinstonModule.forRoot({
+      format: winston.format.combine(
+        winston.format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
+        winston.format.json(),
+      ),
       transports: [
-        // 콘솔 출력 옵션 지정
-        new winston.transports.Console({
-          level: env === 'production' ? 'http' : 'silly',
-          format:
-            env === 'production'
-              ? winston.format.simple() // production 환경에서는 간단한 로그 포맷
-              : winston.format.combine(
-                  winston.format.colorize({
-                    all: true,
-                    colors: {
-                      info: 'green',
-                      warn: 'magenta',
-                      error: 'red',
-                      debug: 'yellow',
-                    },
-                  }),
-                  winston.format.timestamp(),
-                  winston.format.printf(
-                    ({ level, message, timestamp }) =>
-                      `${timestamp} [${level}]: ${message}`,
-                  ),
-                ),
-        }),
-
-        // 파일 로깅 옵션 지정
-        new winstonDaily({
-          level: 'http',
-          datePattern: 'YYYY-MM-DD',
+        new winston.transports.Console(), // ✅ `format` 제거 (전체 설정을 따라감)
+        new DailyRotateFile({
           dirname: join(__dirname, '..', '..', 'logs'),
-          filename: `app.log.%DATE%`,
+          filename: 'app-%DATE%.log',
+          datePattern: 'YYYY-MM-DD',
           maxFiles: '30d',
           zippedArchive: true,
-          handleExceptions: true,
-          json: false,
         }),
       ],
-      format: winston.format.combine(
-        winston.format.timestamp({
-          format: () => moment().tz('Asia/Seoul').format(),
-        }),
-        winston.format.json(),
-        winston.format.printf((info) => {
-          return `${info.timestamp} - ${info.level} [${process.pid}]: ${info.message}`;
-        }),
-      ),
     }),
     ScheduleModule.forRoot(),
-    PostModule,
     DrizzleModule,
     AuthModule,
     UserModule,
     CommonModule,
     ImageMangeModule,
-    NewsModule,
   ],
   controllers: [AppController],
   providers: [AppService, CustomLogger],

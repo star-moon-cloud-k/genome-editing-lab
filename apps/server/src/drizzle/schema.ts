@@ -1,17 +1,13 @@
-import { sql } from 'drizzle-orm';
-
 import {
-  bigint,
-  bigserial,
-  boolean,
-  date,
   integer,
+  jsonb,
   pgEnum,
   pgTable,
   primaryKey,
   serial,
   text,
   timestamp,
+  unique,
   uuid,
   varchar,
 } from 'drizzle-orm/pg-core';
@@ -20,16 +16,10 @@ export const Timestamp = {
   createdAt: timestamp('created_at').notNull().defaultNow(),
   updatedAt: timestamp('updated_at'),
 } as const;
-export const UserRole = pgEnum('role', ['user']);
+export const UserRole = pgEnum('role', ['user', 'manager', 'admin']);
 export const Status = pgEnum('status', ['active', 'disabled']);
-export const PostType = pgEnum('postType', [
-  'public',
-  'announcement',
-  'business',
-  'event',
-]);
 
-export const ImageType = pgEnum('type', ['post']);
+export const ImageType = pgEnum('type', ['stock']);
 
 export const Images = pgTable('images', {
   id: uuid('id').defaultRandom().primaryKey(),
@@ -37,109 +27,53 @@ export const Images = pgTable('images', {
   url: text('url').notNull(),
   type: ImageType('type'),
   order: integer('order').default(0),
-  postId: bigint('post_id', { mode: 'number' }).references(() => Post.id),
   ...Timestamp,
 });
 
-export const Business = pgTable('business', {
+export const Lab = pgTable('lab', {
   id: serial('id').primaryKey(),
-  type: varchar('type'),
   name: varchar('name'),
-});
-
-export const User = pgTable('users', {
-  id: uuid('id')
-    .default(sql`gen_random_uuid()`)
-    .primaryKey(),
-  CI: varchar('CI', { length: 200 }).unique(),
-  nickname: varchar('nickname', { length: 20 }),
-  role: UserRole('role'),
-  status: Status('status'),
-  lastLoginAt: timestamp('last_login_at'),
-  registeredAt: timestamp('registered_at'),
+  professor: varchar('professor'),
+  major: varchar('major'),
+  schoolName: varchar('school_name'),
   ...Timestamp,
 });
 
-export const UserBusiness = pgTable('user_business', {
-  id: serial('id').primaryKey(),
-  userId: uuid('user_id').references(() => User.id),
-  businessId: integer('business_id').references(() => Business.id),
-});
-
-export const BoardType = pgTable('board_type', {
-  id: serial('id').primaryKey(),
-  type: varchar('type'),
-  businessId: integer('business_id').references(() => Business.id),
-});
-
-export const Post = pgTable('post', {
-  id: bigserial('id', { mode: 'number' }).primaryKey(),
-  title: varchar('title'),
-  content: text('content'),
-  authorId: uuid('author_id').references(() => User.id),
-  status: Status('status'),
-  postType: PostType('post_type'),
-  boardId: integer('board_id').references(() => BoardType.id),
-  deletedAt: timestamp('deleted_at'),
-  ...Timestamp,
-});
-
-export const Comment = pgTable('comment', {
-  id: uuid('id')
-    .default(sql`gen_random_uuid()`)
-    .primaryKey(),
-  body: text('body'),
-  isAnonymity: boolean('is_anonymity'),
-  authorId: uuid('author_id').references(() => User.id),
-  parentComment: uuid('parent_comment').references(() => Comment.id),
-  postId: bigint('post_id', { mode: 'number' }).references(() => Post.id),
-  ...Timestamp,
-});
-
-export const CommentLike = pgTable(
-  'comment_like',
+export const User = pgTable(
+  'users',
   {
-    userId: uuid('user_id').references(() => User.id),
-    commentId: uuid('comment_id').references(() => Comment.id),
-    createdAt: timestamp('created_at').notNull().defaultNow(),
+    id: serial('id').primaryKey(),
+    studentNumber: varchar('student_number', { length: 15 }).notNull(),
+    password: varchar('password', { length: 40 }),
+    role: UserRole('role'),
+    status: Status('status'),
+    lab: integer('lab').references(() => Lab.id),
+    lastLoginAt: timestamp('last_login_at'),
+    ...Timestamp,
   },
-  (table) => [
-    primaryKey({ columns: [table.commentId, table.userId] }),
-    primaryKey({
-      name: 'comment_like_pk',
-      columns: [table.commentId, table.userId],
-    }),
-  ],
+  (table) => [unique().on(table.studentNumber, table.lab)],
 );
 
-export const PostLike = pgTable(
-  'post_like',
-  {
-    userId: uuid('user_id').references(() => User.id),
-    postId: bigint('post_id', { mode: 'number' }).references(() => Post.id),
-    createdAt: timestamp('created_at').notNull().defaultNow(),
-  },
-  (table) => [
-    primaryKey({ columns: [table.postId, table.userId] }),
-    primaryKey({
-      name: 'post_like_pk',
-      columns: [table.postId, table.userId],
-    }),
-  ],
-);
-
-export const News = pgTable('news', {
+export const Stock = pgTable('stock', {
   id: serial('id').primaryKey(),
-  guid: varchar('guid', { length: 512 }).unique(),
-  title: varchar('title'),
-  source: varchar('source'),
-  link: varchar('link'),
-  pubDate: date('pubDate'),
-  createdAt: timestamp('created_at').notNull().defaultNow(),
+  name: varchar('name', { length: 255 }),
+  importCompany: varchar('importer_company', { length: 100 }),
+  orderType: varchar('order_type', { length: 30 }),
+  vendor: varchar('vendor', { length: 100 }),
+  catalogId: varchar('catalog_id'),
+  quantity: integer('quantity'),
+  image: uuid('image').references(() => Images.id),
+  minimumQuantity: integer('minimum_quantity'),
+  maximumQuantity: integer('maximum_quantity'),
+  description: varchar('description', { length: 400 }),
+  lab: integer('lab').references(() => Lab.id),
+  extra: jsonb('extra'),
+  ...Timestamp,
 });
 
-export const RssKeyword = pgTable('rss_keyword', {
+export const Supplier = pgTable('supplier', {
   id: serial('id').primaryKey(),
-  keyword: varchar('keyword').unique(),
-  createdAt: timestamp('created_at').notNull().defaultNow(),
+  vendor: varchar('vendor'),
+  description: varchar('description'),
+  lab: integer('lab').references(() => Lab.id),
 });

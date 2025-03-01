@@ -32,8 +32,12 @@ export class AuthController {
     if (!user) {
       throw new UnauthorizedException('invalid credentials');
     }
-    const accessToken = await this.authService.generateAccessToken(user);
-    const refreshToken = await this.authService.generateRefreshToken(user);
+    const accessToken = await this.authService.generateAccessToken(
+      user.id.toString(),
+    );
+    const refreshToken = await this.authService.generateRefreshToken(
+      user.id.toString(),
+    );
 
     return { accessToken, refreshToken };
   }
@@ -56,14 +60,12 @@ export class AuthController {
         decodedRefreshToken.exp > now
       ) {
         await this.authService.verifyRefreshToken(payload.refreshToken);
-        const accessToken = await this.authService.generateAccessToken({
-          CI: decodedAccessToken.userCI,
-          id: decodedAccessToken.sub,
-        });
-        const refreshToken = await this.authService.generateRefreshToken({
-          CI: decodedAccessToken.userCI,
-          id: decodedAccessToken.sub,
-        });
+        const accessToken = await this.authService.generateAccessToken(
+          decodedAccessToken.sub,
+        );
+        const refreshToken = await this.authService.generateRefreshToken(
+          decodedAccessToken.sub,
+        );
         return { accessToken, refreshToken };
       }
     } else {

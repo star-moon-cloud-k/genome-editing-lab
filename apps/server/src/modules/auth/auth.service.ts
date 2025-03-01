@@ -1,23 +1,21 @@
-import * as Schema from '@drizzle/schema';
-import { Inject, Injectable, UnauthorizedException } from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import {
   JsonWebTokenError,
   JwtService,
+  JwtSignOptions,
   NotBeforeError,
   TokenExpiredError,
 } from '@nestjs/jwt';
-import { REFRESH, SECOND } from '@root/common/const/cache-key.const';
+import { REFRESH } from '@root/common/const/cache-key.const';
 import {
-  ENV_JWT_REFRESH_EXPIRATION_TIME,
+  ENV_JWT_EXPIRATION_TIME,
   ENV_JWT_REFRESH_SECRET_KEY,
   ENV_JWT_SECRET_KEY,
 } from '@root/common/const/env-keys.const';
 import { TokenPayload, TokeType } from '@root/modules/auth/common/auth.const';
 import { UserService } from '@root/modules/user/user.service';
-import { NodePgDatabase } from 'drizzle-orm/node-postgres';
 import { UserType } from '../user/common/user.dto';
-import { DrizzleAsyncProvider } from '@root/drizzle/drizzle.provider';
 
 @Injectable()
 export class AuthService {
@@ -28,44 +26,40 @@ export class AuthService {
   ) {}
 
   async validateUser(
-    phoneNumber: string,
+    id: string,
     password: string,
   ): Promise<UserType | undefined> {
-    const [user] = await this.userService.getValidateUser(
-      phoneNumber,
-      password,
-    );
+    const [user] = await this.userService.getValidateUser(id, password);
     if (user) {
       delete user.createdAt;
       delete user.updatedAt;
       delete user.lastLoginAt;
-      delete user.registeredAt;
       return user;
     } else {
       throw new UnauthorizedException('invalid password');
     }
   }
   //SECTION - Token 생성
-  async generateAccessToken(user: UserType) {
+  async generateAccessToken(id: string) {
     const payload: TokenPayload = {
-      userCI: user.CI,
-      sub: user.id,
+      sub: id,
       type: TokeType.ACCESS,
     };
     return this.jwtService.sign(payload, {
       secret: this.configService.get<string>(ENV_JWT_SECRET_KEY),
-    });
+      expiresIn: this.configService.get<string>(ENV_JWT_EXPIRATION_TIME),
+    } as JwtSignOptions);
   }
 
-  async generateRefreshToken(user: UserType) {
+  async generateRefreshToken(id: string) {
     const payload: TokenPayload = {
-      sub: user.id,
+      sub: id,
       type: TokeType.REFRESH,
     };
     return this.jwtService.sign(payload, {
       secret: this.configService.get<string>(ENV_JWT_REFRESH_SECRET_KEY),
-      expiresIn: process.env.JWT_REFRESH_EXPIRATION_TIME,
-    });
+      expiresIn: this.configService.get<string>(ENV_JWT_EXPIRATION_TIME),
+    } as JwtSignOptions);
   }
   //!SECTION
 

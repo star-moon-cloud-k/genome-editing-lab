@@ -1,6 +1,7 @@
 {
+  "extends": "../../tsconfig.json",
   "compilerOptions": {
-    "module": "commonjs",
+    "preserveSymlinks": true,
     "declaration": true,
     "removeComments": true,
     "emitDecoratorMetadata": true,
@@ -21,7 +22,8 @@
       "@root/*": ["./src/*"],
       "@auth/*": ["./src/modules/auth/*"],
       "@drizzle/*": ["./src/drizzle/*"],
-      "@common/*": ["./src/common/*"]
+      "@common/*": ["./src/common/*"],
+      "@shared/*": ["../../packages/shared/*"]
     }
   }
 }

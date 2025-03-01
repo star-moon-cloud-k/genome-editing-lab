@@ -7,14 +7,12 @@ import {
   InternalServerErrorException,
 } from '@nestjs/common';
 import { DrizzleAsyncProvider } from '@root/drizzle/drizzle.provider';
-import {
-  CreateUserReq,
-  InsertUserDto,
-} from '@root/modules/user/common/user.dto';
 import { UserRole, UserStatus } from '@root/modules/user/common/user.enum';
+import { CreateUserReq } from '@shared/dto/users/users.dto';
 import { createHash } from 'crypto';
-import { eq, getTableColumns, or } from 'drizzle-orm';
+import { eq, getTableColumns, and } from 'drizzle-orm';
 import { NodePgDatabase } from 'drizzle-orm/node-postgres';
+import { InsertUserDto } from './common/user.dto';
 
 @Injectable()
 export class UserService {
@@ -23,25 +21,28 @@ export class UserService {
     private db: NodePgDatabase<typeof schema>,
   ) {}
 
-  generateCI(phoneNumber: string, password: string): string {
-    const hash = createHash('sha256');
-    hash.update(phoneNumber + password);
-    return hash.digest('hex');
-  }
   async create(payload: CreateUserReq) {
-    const CI = this.generateCI(payload.phoneNumber, payload.password);
-    const [userExiest] = await this.db
+    if (payload.password !== payload.passwordCheck) {
+      throw new BadRequestException(`password is not verified`);
+    }
+    const [userExist] = await this.db
       .select()
       .from(User)
-      .where(or(eq(User.CI, CI)));
+      .where(
+        and(
+          eq(User.lab, payload.labId),
+          eq(User.studentNumber, payload.studentId),
+        ),
+      );
 
-    if (userExiest) {
-      throw new BadRequestException(`Phone Number is already exist`);
+    if (userExist) {
+      throw new BadRequestException(`User is already exist`);
     }
 
     const user = new InsertUserDto();
 
-    user.CI = CI;
+    user.studentNumber = payload.studentId;
+    user.lab = payload.labId;
     user.role = UserRole.USER;
     user.status = UserStatus.ACTIVE;
     user.lastLoginAt = new Date();
@@ -60,11 +61,10 @@ export class UserService {
     return `This action returns all user`;
   }
 
-  async findOne(id: string) {
+  async findOne(id: number) {
     const [user] = await this.db
       .select({
         id: User.id,
-        nickname: User.nickname,
         role: User.role,
       })
       .from(User)
@@ -84,11 +84,12 @@ export class UserService {
     return `This action removes a #${id} user`;
   }
 
-  async getValidateUser(phoneNumber: string, password: string) {
-    const CI = this.generateCI(phoneNumber, password);
+  async getValidateUser(studentNumber: string, password: string) {
     return await this.db
       .select(getTableColumns(User))
       .from(User)
-      .where(eq(User.CI, CI));
+      .where(
+        and(eq(User.studentNumber, studentNumber), eq(User.password, password)),
+      );
   }
 }

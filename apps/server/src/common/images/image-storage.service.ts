@@ -1,5 +1,5 @@
 import { Injectable, Inject } from '@nestjs/common';
-import { ImageStorage } from './image-storage.interface';
+import type { ImageStorage } from './image-storage.interface';
 
 @Injectable()
 export class ImageManageService {

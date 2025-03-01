@@ -21,6 +21,6 @@ async function bootstrap() {
   app.useGlobalPipes(new ZodValidationPipe());
   app.useGlobalInterceptors(new LogInterceptor());
   await app.listen(process.env.PORT);
-  console.info(`mosaic start on ${process.env.PORT}`);
+  console.info(`LabServer start on ${process.env.PORT}`);
 }
 bootstrap();

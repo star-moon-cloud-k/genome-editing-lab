@@ -23,7 +23,9 @@ export class LocalStorageService implements ImageStorage {
       await fs.writeFile(fullPath, file.buffer); // 파일 저장
       this.logger.log(`임시 파일이 성공적으로 저장되었습니다: ${fileName}`); // 'log' 사용
     } catch (e) {
-      this.logger.error(`임시 파일 저장 실패: ${e.message}`, e.stack);
+      if (e instanceof Error) {
+        this.logger.error(`임시 파일 저장 실패: ${e.message}`, e.stack);
+      }
       throw new InternalServerErrorException('임시 파일 저장에 실패했습니다.');
     }
 
@@ -35,8 +37,9 @@ export class LocalStorageService implements ImageStorage {
     try {
       await fs.unlink(join(PROJECT_ROOT_PATH, filePath));
       this.logger.log(`파일이 성공적으로 삭제되었습니다: ${filePath}`); // 'log' 사용
-    } catch (err) {
-      this.logger.warn(`파일 삭제 실패: ${filePath} - ${err.message}`);
+    } catch (e) {
+      if (e instanceof Error)
+        this.logger.warn(`파일 삭제 실패: ${filePath} - ${e.message}`);
       // 필요에 따라 예외를 던질 수 있습니다.
       // throw new InternalServerErrorException('파일 삭제에 실패했습니다.');
     }
