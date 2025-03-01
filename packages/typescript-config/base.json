@@ -1,6 +1,5 @@
 {
   "$schema": "https://json.schemastore.org/tsconfig",
-  "display": "Default",
   "compilerOptions": {
     "declaration": true,
     "declarationMap": true,
@@ -15,12 +14,6 @@
     "resolveJsonModule": true,
     "skipLibCheck": true,
     "strict": true,
-    "target": "ES2022",
-    "baseUrl": ".",
-    "paths": {
-      "@shared/*": ["../shared/*"],
-      "@drizzle/*": ["../..//apps/server/src/drizzle/*"],
-      "@root/*": ["./../../*"]
-    }
+    "target": "ES2022"
   }
 }

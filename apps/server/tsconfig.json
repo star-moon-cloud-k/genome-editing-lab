@@ -1,23 +1,8 @@
 {
-  "extends": "../../tsconfig.json",
+  "extends": "../../packages/typescript-config/nestjs.json",
   "compilerOptions": {
-    "preserveSymlinks": true,
-    "declaration": true,
-    "removeComments": true,
-    "emitDecoratorMetadata": true,
-    "experimentalDecorators": true,
-    "allowSyntheticDefaultImports": true,
-    "target": "ES2021",
-    "sourceMap": true,
-    "outDir": "./dist",
     "baseUrl": "./",
-    "incremental": true,
-    "skipLibCheck": true,
-    "strictNullChecks": false,
-    "noImplicitAny": false,
-    "strictBindCallApply": false,
-    "forceConsistentCasingInFileNames": false,
-    "noFallthroughCasesInSwitch": false,
+    "outDir": "./dist",
     "paths": {
       "@root/*": ["./src/*"],
       "@auth/*": ["./src/modules/auth/*"],
@@ -25,5 +10,7 @@
       "@common/*": ["./src/common/*"],
       "@shared/*": ["../../packages/shared/*"]
     }
-  }
+  },
+  "include": ["src/**/*", "../../packages/shared/**/*"], // ✅ `shared` 추가
+  "exclude": ["node_modules", "dist"]
 }
