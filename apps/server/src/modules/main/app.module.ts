@@ -6,18 +6,18 @@ import {
   TEMP_FOLDER_PATH,
 } from '@root/common/const/path.const';
 import { ImageMangeModule } from '@root/common/images/image-storage-local.module';
-import { DrizzleModule } from '@root/drizzle/drizzle.module';
 import { CustomLogger } from '@root/utils/logger/logger.service';
 import { WinstonModule } from 'nest-winston';
 import * as winston from 'winston';
 import DailyRotateFile from 'winston-daily-rotate-file';
 import { CommonModule } from '../../common/common.module';
-import { AuthModule } from '../auth/auth.module';
-import { UserModule } from '../user/user.module';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { ScheduleModule } from '@nestjs/schedule';
 import { join } from 'path';
+import { PrismaService } from '@root/prisma';
+import { AuthModule } from '../auth/auth.module';
+import { UserModule } from '../user/user.module';
 
 const env = process.env.NODE_ENV || 'development';
 
@@ -54,13 +54,11 @@ const env = process.env.NODE_ENV || 'development';
       ],
     }),
     ScheduleModule.forRoot(),
-    DrizzleModule,
+    CommonModule,
     AuthModule,
     UserModule,
-    CommonModule,
-    ImageMangeModule,
   ],
   controllers: [AppController],
-  providers: [AppService, CustomLogger],
+  providers: [AppService, CustomLogger, PrismaService],
 })
 export class AppModule {}

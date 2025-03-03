@@ -1,78 +1,107 @@
-import * as schema from '@drizzle/schema';
-import { User } from '@drizzle/schema';
 import {
   BadRequestException,
-  Inject,
   Injectable,
   InternalServerErrorException,
 } from '@nestjs/common';
-import { DrizzleAsyncProvider } from '@root/drizzle/drizzle.provider';
+import { Prisma, users } from '@prisma/client';
 import { UserRole, UserStatus } from '@root/modules/user/common/user.enum';
+import { PrismaService } from '@root/prisma';
 import { CreateUserReq } from '@shared/dto/users/users.dto';
-import { createHash } from 'crypto';
-import { eq, getTableColumns, and } from 'drizzle-orm';
-import { NodePgDatabase } from 'drizzle-orm/node-postgres';
-import { InsertUserDto } from './common/user.dto';
+import { AuthService } from '../auth/auth.service';
+import { forwardRef, Inject } from '@nestjs/common';
 
 @Injectable()
 export class UserService {
   constructor(
-    @Inject(DrizzleAsyncProvider)
-    private db: NodePgDatabase<typeof schema>,
+    private readonly prisma: PrismaService,
+    @Inject(forwardRef(() => AuthService))
+    private readonly authService: AuthService,
   ) {}
 
   async create(payload: CreateUserReq) {
     if (payload.password !== payload.passwordCheck) {
       throw new BadRequestException(`password is not verified`);
     }
-    const [userExist] = await this.db
-      .select()
-      .from(User)
-      .where(
-        and(
-          eq(User.lab, payload.labId),
-          eq(User.studentNumber, payload.studentId),
-        ),
-      );
 
-    if (userExist) {
+    const isLabExist = await this.prisma.lab.findUnique({
+      where: {
+        id: payload.labId,
+      },
+    });
+
+    if (!isLabExist) {
+      throw new BadRequestException(`Lab id is not exist`);
+    }
+
+    const isUserExist = await this.prisma.users.findUnique({
+      where: {
+        student_number_lab: {
+          lab: payload.labId,
+          student_number: payload.studentNumber,
+        },
+      },
+    });
+
+    if (isUserExist) {
       throw new BadRequestException(`User is already exist`);
     }
 
-    const user = new InsertUserDto();
+    const hashedPassword = await this.authService.getHashedPassword(
+      payload.password,
+    );
 
-    user.studentNumber = payload.studentId;
-    user.lab = payload.labId;
-    user.role = UserRole.USER;
-    user.status = UserStatus.ACTIVE;
-    user.lastLoginAt = new Date();
+    try {
+      return this.prisma.$transaction(async (tx) => {
+        const insertData = await tx.users.create({
+          data: {
+            student_number: payload.studentNumber,
+            lab: payload.labId,
+            role: UserRole.USER,
+            status: UserStatus.ACTIVE,
+            password: hashedPassword,
+            last_login_at: new Date(),
+          },
+        });
 
-    return await this.db.transaction(async (tx) => {
-      const [insertData] = await tx.insert(User).values(user).returning();
-      if (!insertData) {
-        tx.rollback();
-        throw new InternalServerErrorException('Server occured error');
-      }
-      return insertData;
-    });
+        return insertData;
+      });
+    } catch (e) {
+      throw new InternalServerErrorException('사용자 생성 중 오류 발생');
+    }
   }
 
   findAll() {
     return `This action returns all user`;
   }
 
-  async findOne(id: number) {
-    const [user] = await this.db
-      .select({
-        id: User.id,
-        role: User.role,
-      })
-      .from(User)
-      .where(eq(User.id, id));
+  async findOne<T extends Prisma.usersSelect>(
+    id: number,
+    select?: T,
+  ): Promise<
+    T extends undefined ? users : Prisma.usersGetPayload<{ select: T }>
+  > {
+    const user = await this.prisma.users.findFirst({
+      where: { id },
+      select: select ? select : undefined,
+    });
+
     if (!user) {
       throw new BadRequestException(`id is not exist`);
     }
 
+    return user as T extends undefined
+      ? users
+      : Prisma.usersGetPayload<{ select: T }>;
+  }
+
+  async findOneByStudentNumber(studentNumber: string) {
+    const user = await this.prisma.users.findFirst({
+      where: { student_number: studentNumber },
+    });
+
+    if (!user) {
+      throw new BadRequestException('invalid user id');
+    }
     return user;
   }
 
@@ -82,14 +111,5 @@ export class UserService {
 
   remove(id: number) {
     return `This action removes a #${id} user`;
-  }
-
-  async getValidateUser(studentNumber: string, password: string) {
-    return await this.db
-      .select(getTableColumns(User))
-      .from(User)
-      .where(
-        and(eq(User.studentNumber, studentNumber), eq(User.password, password)),
-      );
   }
 }

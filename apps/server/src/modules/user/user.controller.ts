@@ -3,11 +3,11 @@ import {
   Controller,
   Delete,
   Get,
+  Inject,
   Param,
   Patch,
   Post,
 } from '@nestjs/common';
-
 import { UserService } from './user.service';
 import { AuthService } from '../auth/auth.service';
 import { CreateUserReq } from '@shared/dto/users/users.dto';

@@ -13,25 +13,21 @@ import {
   RefreshTokenReq,
   UserLoginReq,
 } from '@root/modules/auth/common/auth.dto';
-import { UserService } from '@root/modules/user/user.service';
 
 @Controller('api/auth')
 export class AuthController {
   constructor(
     private readonly authService: AuthService,
-    private readonly userService: UserService,
     private readonly configService: ConfigService,
   ) {}
 
   @Post('/login')
   async login(@Body() payload: UserLoginReq) {
     const user = await this.authService.validateUser(
-      payload.phoneNumber,
+      payload.studentId,
       payload.password,
     );
-    if (!user) {
-      throw new UnauthorizedException('invalid credentials');
-    }
+
     const accessToken = await this.authService.generateAccessToken(
       user.id.toString(),
     );

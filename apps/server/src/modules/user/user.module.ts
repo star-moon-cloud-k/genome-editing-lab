@@ -1,13 +1,13 @@
 import { forwardRef, Module } from '@nestjs/common';
 import { UserService } from './user.service';
 import { UserController } from './user.controller';
-import { DrizzleModule } from '@root/drizzle/drizzle.module';
 import { AuthModule } from '../auth/auth.module';
+import { PrismaService } from '@root/prisma';
 
 @Module({
-  imports: [DrizzleModule, forwardRef(() => AuthModule)],
+  imports: [forwardRef(() => AuthModule)],
   controllers: [UserController],
-  providers: [UserService],
+  providers: [UserService, PrismaService],
   exports: [UserService],
 })
 export class UserModule {}

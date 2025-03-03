@@ -1,0 +1,91 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../generated/client"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model images {
+  id         String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  key        String?
+  url        String
+  type       type?
+  order      Int?      @default(0)
+  created_at DateTime  @default(now()) @db.Timestamp(6)
+  updated_at DateTime? @db.Timestamp(6)
+  stock      stock[]
+}
+
+model lab {
+  id                         Int        @id @default(autoincrement())
+  name                       String?    @db.VarChar
+  professor                  String?    @db.VarChar
+  major                      String?    @db.VarChar
+  school_name                String?    @db.VarChar
+  created_at                 DateTime   @default(now()) @db.Timestamp(6)
+  updated_at                 DateTime?  @db.Timestamp(6)
+  stock_stock_labTolab       stock[]    @relation("stock_labTolab")
+  supplier_supplier_labTolab supplier[] @relation("supplier_labTolab")
+  users_users_labTolab       users[]    @relation("users_labTolab")
+}
+
+model stock {
+  id                 Int       @id @default(autoincrement())
+  name               String?   @db.VarChar(255)
+  importer_company   String?   @db.VarChar(100)
+  order_type         String?   @db.VarChar(30)
+  vendor             String?   @db.VarChar(100)
+  catalog_id         String?   @db.VarChar
+  quantity           Int?
+  image              String?   @db.Uuid
+  minimum_quantity   Int?
+  maximum_quantity   Int?
+  description        String?   @db.VarChar(400)
+  lab                Int?
+  extra              Json?
+  created_at         DateTime  @default(now()) @db.Timestamp(6)
+  updated_at         DateTime? @db.Timestamp(6)
+  images             images?   @relation(fields: [image], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "stock_image_images_id_fk")
+  lab_stock_labTolab lab?      @relation("stock_labTolab", fields: [lab], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "stock_lab_lab_id_fk")
+}
+
+model supplier {
+  id                    Int     @id @default(autoincrement())
+  vendor                String? @db.VarChar
+  description           String? @db.VarChar
+  lab                   Int?
+  lab_supplier_labTolab lab?    @relation("supplier_labTolab", fields: [lab], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "supplier_lab_lab_id_fk")
+}
+
+model users {
+  id                 Int       @id @default(autoincrement())
+  student_number     String    @db.VarChar(15)
+  password           String?   @db.VarChar(100)
+  role               role?
+  status             status?
+  lab                Int?
+  last_login_at      DateTime? @db.Timestamp(6)
+  created_at         DateTime  @default(now()) @db.Timestamp(6)
+  updated_at         DateTime? @db.Timestamp(6)
+  lab_users_labTolab lab?      @relation("users_labTolab", fields: [lab], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "users_lab_lab_id_fk")
+
+  @@unique([student_number, lab], map: "users_student_number_lab_unique")
+}
+
+enum role {
+  user
+  manager
+  admin
+}
+
+enum status {
+  active
+  disabled
+}
+
+enum type {
+  stock
+}

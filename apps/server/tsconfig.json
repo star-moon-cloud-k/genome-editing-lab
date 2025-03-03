@@ -3,12 +3,14 @@
   "compilerOptions": {
     "baseUrl": "./",
     "outDir": "./dist",
+    "strict": true,
     "paths": {
       "@root/*": ["./src/*"],
       "@auth/*": ["./src/modules/auth/*"],
       "@drizzle/*": ["./src/drizzle/*"],
       "@common/*": ["./src/common/*"],
-      "@shared/*": ["../../packages/shared/*"]
+      "@shared/*": ["../../packages/shared/*"],
+      "@prisma/*": ["../../packages/database/generated/*"]
     }
   },
   "include": ["src/**/*", "../../packages/shared/**/*"], // ✅ `shared` 추가

@@ -1,4 +1,8 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import {
   JsonWebTokenError,
@@ -14,30 +18,27 @@ import {
   ENV_JWT_SECRET_KEY,
 } from '@root/common/const/env-keys.const';
 import { TokenPayload, TokeType } from '@root/modules/auth/common/auth.const';
-import { UserService } from '@root/modules/user/user.service';
-import { UserType } from '../user/common/user.dto';
+import * as bcrypt from 'bcrypt';
+import { UserService } from '../user/user.service';
+import { users } from '@prisma/client';
 
 @Injectable()
 export class AuthService {
   constructor(
-    private readonly userService: UserService,
     private readonly jwtService: JwtService,
     private readonly configService: ConfigService,
+    private readonly userService: UserService,
   ) {}
 
-  async validateUser(
-    id: string,
-    password: string,
-  ): Promise<UserType | undefined> {
-    const [user] = await this.userService.getValidateUser(id, password);
-    if (user) {
-      delete user.createdAt;
-      delete user.updatedAt;
-      delete user.lastLoginAt;
-      return user;
-    } else {
+  async validateUser(studentId: string, password: string): Promise<users> {
+    const user = await this.userService.findOneByStudentNumber(studentId);
+    const isValid = this.checkHashedPassword(password, user.password);
+    if (!isValid) {
       throw new UnauthorizedException('invalid password');
     }
+    delete user.created_at;
+    delete user.updated_at;
+    return user;
   }
   //SECTION - Token 생성
   async generateAccessToken(id: string) {
@@ -128,5 +129,14 @@ export class AuthService {
   async getUserTokenKey(sub: string) {
     const key = btoa(sub);
     return REFRESH.concat(key);
+  }
+
+  async getHashedPassword(password: string): Promise<string> {
+    const salt = await bcrypt.genSalt();
+    return bcrypt.hash(password, salt);
+  }
+
+  async checkHashedPassword(password: string, hash: string): Promise<boolean> {
+    return bcrypt.compare(password, hash);
   }
 }
