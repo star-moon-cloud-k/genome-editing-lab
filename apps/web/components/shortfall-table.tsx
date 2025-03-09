@@ -12,7 +12,7 @@ import {
 } from "@workspace/ui/components/table";
 import { FlaskConicalOff } from "lucide-react";
 import Image from "next/image";
-import stock from "@config/stock.json";
+import { stock } from "@config/layout.json";
 
 export default function ShortfallTable() {
   return (

@@ -3,6 +3,7 @@ import {
   Body,
   Controller,
   Post,
+  Res,
   UnauthorizedException,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
@@ -13,6 +14,8 @@ import {
   RefreshTokenReq,
   UserLoginReq,
 } from '@root/modules/auth/common/auth.dto';
+import { BEARER } from '@utils/api/fetch.type';
+import { Response } from 'express';
 
 @Controller('api/auth')
 export class AuthController {
@@ -22,7 +25,7 @@ export class AuthController {
   ) {}
 
   @Post('/login')
-  async login(@Body() payload: UserLoginReq) {
+  async login(@Body() payload: UserLoginReq, @Res() res: Response) {
     const user = await this.authService.validateUser(
       payload.studentId,
       payload.password,
@@ -35,7 +38,24 @@ export class AuthController {
       user.id.toString(),
     );
 
-    return { accessToken, refreshToken };
+    // ✅ 쿠키에 저장 (httpOnly + secure 설정)
+    res.cookie('accessToken', accessToken, {
+      httpOnly: true, // XSS 공격 방어
+      // secure: process.env.NODE_ENV === 'production', // HTTPS 환경에서만 사용
+      sameSite: 'strict', // CSRF 방어
+      maxAge: 1000 * 60 * 60, // 1시간 유효
+    });
+
+    res.cookie('refreshToken', refreshToken, {
+      httpOnly: true,
+      // secure: process.env.NODE_ENV === 'production',
+      sameSite: 'strict',
+      maxAge: 1000 * 60 * 60 * 24 * 7, // 7일 유효
+    });
+
+    res.setHeader('Authorization', `${BEARER}${accessToken}`);
+    console.log('what');
+    return res.status(200).json({ permission: user.role, ok: true });
   }
 
   @Post('/refresh-token')

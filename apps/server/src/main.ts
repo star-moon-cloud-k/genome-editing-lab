@@ -12,7 +12,7 @@ async function bootstrap() {
 
   const logger = app.get(CustomLogger);
   app.enableCors({
-    origin: '*', // 허용할 도메인 (모든 도메인 허용)
+    origin: 'http://star-moon-cloud-k.iptime.org:3005', // 허용할 도메인 (모든 도메인 허용)
     methods: 'GET,POST,PUT,DELETE,OPTIONS',
     allowedHeaders: 'Content-Type, Authorization',
     credentials: true, // 쿠키 등 인증 정보 포함 여부

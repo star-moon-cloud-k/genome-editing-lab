@@ -27,11 +27,10 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  // ✅ Access Token 확인
+  // ✅ 서버에서 쿠키 읽기
   const cookieStore = cookies();
   const accessToken = (await cookieStore).get("accessToken");
-
-  console.log(accessToken);
+  // ✅ 로그인되지 않았으면 로그인 페이지로 이동
   return (
     <html lang="en" suppressHydrationWarning>
       <body

@@ -10,3 +10,8 @@ export class CreateUserReq extends createZodDto(
     studentNumber: z.string().min(1).nonempty(),
   })
 ) {}
+
+export const loginRes = z.object({
+  permission: z.enum(["user", "manager", "admin"]),
+  ok: z.coerce.boolean(),
+});

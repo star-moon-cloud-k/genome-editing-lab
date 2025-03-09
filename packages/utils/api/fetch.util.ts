@@ -7,7 +7,7 @@ import {
   GET,
   POST,
   PUT,
-} from './fetch.type';
+} from "./fetch.type";
 
 interface RequestOptions extends ApiClientOptions {
   retry?: boolean; // 토큰 갱신 후 재시도 여부
@@ -19,9 +19,9 @@ class ApiClient {
   private defaultRetries: number;
 
   constructor(
-    apiUrl: string = '',
-    defaultTimeout: number = 10000,
-    defaultRetries: number = 3,
+    apiUrl: string = "",
+    defaultTimeout: number = 100000,
+    defaultRetries: number = 3
   ) {
     this.apiUrl = apiUrl;
     this.defaultTimeout = defaultTimeout;
@@ -51,18 +51,19 @@ class ApiClient {
     };
 
     try {
-      const response = await fetch(`${this.apiUrl}/${url}`, {
+      const response = await fetch(`${url}`, {
         method,
         headers: authHeaders,
         body,
         signal,
+        credentials: "include", // ✅ 쿠키 포함
       });
 
       clearTimeout(timeoutId);
 
       if (response.status === 401 && retry) {
         return this.request<T>({ ...options, retry: false });
-        throw new Error('[ERROR] Unable to refresh access token.');
+        throw new Error("[ERROR] Unable to refresh access token.");
       }
 
       if (!response.ok) {
@@ -71,15 +72,15 @@ class ApiClient {
         throw new Error(errorMessage);
       }
 
-      const contentType = response.headers.get('Content-Type');
+      const contentType = response.headers.get("Content-Type");
       if (contentType && contentType.includes(APPLICATION_JSON)) {
         return (await response.json()) as T;
       } else {
         return (await response.text()) as unknown as T;
       }
     } catch (error: any) {
-      if (error.name === 'AbortError') {
-        throw new Error('[ERROR] Request timeout');
+      if (error.name === "AbortError") {
+        throw new Error("[ERROR] Request timeout");
       }
       throw error;
     }
@@ -94,12 +95,12 @@ class ApiClient {
   public async post<T = any>(
     url: string,
     body: any,
-    headers?: HeadersInit,
+    headers?: HeadersInit
   ): Promise<T> {
     return this.request<T>({
       url,
       method: POST,
-      headers: headers ?? { 'Content-Type': APPLICATION_JSON },
+      headers: headers ?? { "Content-Type": APPLICATION_JSON },
       body: JSON.stringify(body),
     });
   }
@@ -107,12 +108,12 @@ class ApiClient {
   public async put<T = any>(
     url: string,
     body: any,
-    headers?: HeadersInit,
+    headers?: HeadersInit
   ): Promise<T> {
     return this.request<T>({
       url,
       method: PUT,
-      headers: headers ?? { 'Content-Type': APPLICATION_JSON },
+      headers: headers ?? { "Content-Type": APPLICATION_JSON },
       body: JSON.stringify(body),
     });
   }

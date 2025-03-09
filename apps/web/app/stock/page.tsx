@@ -1,6 +1,6 @@
 import StockTable from "@/components/stock-table";
 import { Button } from "@workspace/ui/components/button";
-import stockData from "@config/stock.json";
+import { stock as stockData } from "@config/layout.json";
 export default function Stock() {
   return (
     <div className="basic_page">

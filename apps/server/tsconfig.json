@@ -10,9 +10,14 @@
       "@drizzle/*": ["./src/drizzle/*"],
       "@common/*": ["./src/common/*"],
       "@shared/*": ["../../packages/shared/*"],
-      "@prisma/*": ["../../packages/database/generated/*"]
+      "@prisma/*": ["../../packages/database/generated/*"],
+      "@utils/*": ["../../packages/utils/*"]
     }
   },
-  "include": ["src/**/*", "../../packages/shared/**/*"], // ✅ `shared` 추가
+  "include": [
+    "src/**/*",
+    "../../packages/shared/**/*",
+    "../../packages/utils/api"
+  ], // ✅ `shared` 추가
   "exclude": ["node_modules", "dist"]
 }

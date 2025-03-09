@@ -1,6 +1,6 @@
 import MainTable from "@/components/stock-table";
 import { Button } from "@workspace/ui/components/button";
-import { main } from "@config/main.json";
+import { main } from "@config/layout.json";
 import ShortfallTable from "@/components/shortfall-table";
 
 export default function Page() {
