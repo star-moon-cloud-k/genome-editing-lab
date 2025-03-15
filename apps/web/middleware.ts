@@ -12,6 +12,11 @@ export function middleware(request: NextRequest) {
   // ✅ `auth` 관련 경로 (로그인, 회원가입 등)
   const isAuthPath = pathname.startsWith("/auth"); // 정확한 URL 체크
 
+  // /auth/logout 경로는 인증 검사 스킵
+  if (pathname.startsWith("/api/auth/logout")) {
+    return NextResponse.next();
+  }
+
   // ✅ 🔥 보호된 경로 접근 시 토큰 확인
   if (!accessToken && isAuthPath) {
     console.warn(`🔒 보호된 경로 접근 (${pathname}) - 로그인 페이지로 이동`);

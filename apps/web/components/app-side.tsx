@@ -36,6 +36,23 @@ export function AppSidebar() {
       console.error("인증 과정 오류", error);
     }
   };
+
+  async function handleLogout() {
+    try {
+      const response = await fetch("/api/auth/logout", {
+        method: "POST",
+        credentials: "include",
+      });
+      if (!response.ok) {
+        throw new Error("Failed to logout");
+      }
+
+      router.push("/auth");
+    } catch (error) {
+      console.warn(error);
+    }
+  }
+
   useEffect(() => {
     getPermission();
   }, []);
@@ -44,7 +61,6 @@ export function AppSidebar() {
 
   const sideBarHandler = () => {
     if (isMobile) setOpenMobile(false);
-    else setOpen(false);
   };
   return (
     <Sidebar>
@@ -82,7 +98,11 @@ export function AppSidebar() {
         </SidebarGroup>
       </SidebarContent>
 
-      <SidebarFooter />
+      <SidebarFooter>
+        <Button variant={"ghost"} onClick={handleLogout}>
+          logout
+        </Button>
+      </SidebarFooter>
     </Sidebar>
   );
 }

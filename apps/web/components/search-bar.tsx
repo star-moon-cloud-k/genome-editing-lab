@@ -3,6 +3,7 @@ import React, { useState, useEffect } from "react";
 import { Input } from "@workspace/ui/components/input";
 // 예: Heroicons, Lucide, FontAwesome 등 아이콘 라이브러리 import
 import { SearchIcon } from "lucide-react";
+import { Button } from "@workspace/ui/components/button";
 
 export default function SearchBar() {
   const [query, setQuery] = useState("");

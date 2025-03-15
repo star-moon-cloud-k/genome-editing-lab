@@ -11,6 +11,7 @@ import "@workspace/ui/globals.css";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import LoginPage from "./auth/page";
+import { Button } from "@workspace/ui/components/button";
 
 const fontSans = Geist({
   subsets: ["latin"],
