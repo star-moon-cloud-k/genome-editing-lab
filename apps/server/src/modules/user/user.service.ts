@@ -6,7 +6,7 @@ import {
 import { Prisma, users } from '@prisma/client';
 import { UserRole, UserStatus } from '@root/modules/user/common/user.enum';
 import { PrismaService } from '@root/prisma';
-import { CreateUserReq } from '@shared/dto/users/users.dto';
+import { CreateUserReq } from '@shared/users/users.dto';
 import { AuthService } from '../auth/auth.service';
 import { forwardRef, Inject } from '@nestjs/common';
 

@@ -10,7 +10,7 @@ import {
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { AuthService } from '../auth/auth.service';
-import { CreateUserReq } from '@shared/dto/users/users.dto';
+import { CreateUserReq } from '@shared/users/users.dto';
 
 @Controller('api/user')
 export class UserController {

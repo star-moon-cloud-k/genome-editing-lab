@@ -2,9 +2,11 @@ import {
   BadRequestException,
   Body,
   Controller,
+  Get,
   Post,
   Res,
   UnauthorizedException,
+  UseGuards,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 
@@ -16,6 +18,10 @@ import {
 } from '@root/modules/auth/common/auth.dto';
 import { BEARER } from '@utils/api/fetch.type';
 import { Response } from 'express';
+import { JwtAuthGuard } from './guard/jwt.guard';
+import { RoleGuard } from '@root/common/guard/roles.guard';
+import { CurrentUser } from '@root/common/decorator/user.decorator';
+import { UserType } from '../../../apps/server/dist/apps/server/src/apps/server/src/modules/user/common/user.dto';
 
 @Controller('api/auth')
 export class AuthController {
@@ -24,6 +30,11 @@ export class AuthController {
     private readonly configService: ConfigService,
   ) {}
 
+  @Get()
+  @UseGuards(JwtAuthGuard)
+  async checkPermission(@CurrentUser() user: UserType, @Res() res: Response) {
+    return res.status(200).json({ permission: user.role });
+  }
   @Post('/login')
   async login(@Body() payload: UserLoginReq, @Res() res: Response) {
     const user = await this.authService.validateUser(
