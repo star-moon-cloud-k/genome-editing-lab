@@ -11,7 +11,14 @@ export class CreateUserReq extends createZodDto(
   })
 ) {}
 
-export const loginRes = z.object({
+export const userPermissionSchema = z.object({
   permission: z.enum(["user", "manager", "admin"]),
-  ok: z.coerce.boolean(),
 });
+
+export const loginRes = userPermissionSchema.merge(
+  z.object({
+    ok: z.coerce.boolean(),
+  })
+);
+
+export class UserPermissionRes extends createZodDto(userPermissionSchema) {}

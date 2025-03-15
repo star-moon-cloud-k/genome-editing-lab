@@ -12,6 +12,7 @@ export const BEARER = "Bearer ";
 
 export type ApiClientOptions = {
   url: string;
+  path: string;
   method?: typeof GET | typeof POST | typeof PUT | typeof DELETE | typeof PATCH;
   headers?: HeadersInit;
   body?: BodyInit | null;

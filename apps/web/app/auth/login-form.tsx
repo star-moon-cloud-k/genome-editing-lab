@@ -15,7 +15,7 @@ import { useRouter } from "next/navigation";
 import ApiClient from "@workspace/utils/api/fetch.util";
 import { API } from "@/env/env.config";
 import { status } from "../../../../packages/database/generated/client/index";
-import { loginRes } from "../../../../packages/shared/dto/users/users.dto";
+import { loginRes } from "../../../../packages/shared/users/users.dto";
 
 export function LoginForm() {
   const [studentId, setStudentId] = React.useState("");
@@ -28,7 +28,7 @@ export function LoginForm() {
     console.log(`${API}/api/auth/login`);
     setError(null); // ✅ 기존 오류 초기화
     try {
-      const response = await ApiClient.post(`${API}/api/auth/login`, {
+      const response = await ApiClient.post(`${API}`, `/api/auth/login`, {
         studentId,
         password,
       });

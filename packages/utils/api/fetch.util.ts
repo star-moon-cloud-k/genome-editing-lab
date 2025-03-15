@@ -1,5 +1,4 @@
 // src/api/ApiClient.ts
-
 import {
   ApiClientOptions,
   APPLICATION_JSON,
@@ -28,9 +27,29 @@ class ApiClient {
     this.defaultRetries = defaultRetries;
   }
 
+  private async refreshToken<T = any>(
+    url: string
+  ): Promise<{ ok: boolean } | null> {
+    try {
+      const response = await fetch(`${this.apiUrl}/api/auth/refresh-token`, {
+        method: POST,
+        credentials: "include",
+      });
+
+      if (!response.ok) {
+        console.warn("[ERROR] Failed to refresh token.");
+        return null; // If refresh fails, return null
+      }
+      return response.json();
+    } catch (error) {
+      console.error("[ERROR] Error during token refresh:", error);
+      return null;
+    }
+  }
   public async request<T = any>(options: RequestOptions): Promise<T> {
     const {
       url,
+      path,
       method = GET,
       headers = {},
       body = null,
@@ -39,6 +58,7 @@ class ApiClient {
       retry = true, // 토큰 갱신 후 재시도 여부
     } = options;
 
+    this.apiUrl = `${url}`;
     const controller = new AbortController();
     const signal = controller.signal;
 
@@ -51,7 +71,7 @@ class ApiClient {
     };
 
     try {
-      const response = await fetch(`${url}`, {
+      const response = await fetch(`${this.apiUrl}${path}`, {
         method,
         headers: authHeaders,
         body,
@@ -62,14 +82,19 @@ class ApiClient {
       clearTimeout(timeoutId);
 
       if (response.status === 401 && retry) {
-        return this.request<T>({ ...options, retry: false });
+        console.log(`${response}`);
+        const isRefreshed = await this.refreshToken(url);
+
+        if (isRefreshed?.ok) {
+          return this.request<T>({ ...options, retry: false });
+        }
+
         throw new Error("[ERROR] Unable to refresh access token.");
       }
 
       if (!response.ok) {
         const errorMessage = `[Error][HTTP] Status code: ${response.status}`;
-        console.error(errorMessage);
-        throw new Error(errorMessage);
+        console.warn(errorMessage);
       }
 
       const contentType = response.headers.get("Content-Type");
@@ -87,18 +112,24 @@ class ApiClient {
   }
 
   // GET 요청 편의 메서드
-  public async get<T = any>(url: string, headers?: HeadersInit): Promise<T> {
-    return this.request<T>({ url, method: GET, headers });
+  public async get<T = any>(
+    url: string,
+    path: string,
+    headers?: HeadersInit
+  ): Promise<T> {
+    return this.request<T>({ url, path, method: GET, headers });
   }
 
   // POST 요청 편의 메서드
   public async post<T = any>(
     url: string,
+    path: string,
     body: any,
     headers?: HeadersInit
   ): Promise<T> {
     return this.request<T>({
       url,
+      path,
       method: POST,
       headers: headers ?? { "Content-Type": APPLICATION_JSON },
       body: JSON.stringify(body),
@@ -107,20 +138,27 @@ class ApiClient {
   // PUT 요청 편의 메서드
   public async put<T = any>(
     url: string,
+    path: string,
     body: any,
     headers?: HeadersInit
   ): Promise<T> {
     return this.request<T>({
       url,
+      path,
       method: PUT,
       headers: headers ?? { "Content-Type": APPLICATION_JSON },
       body: JSON.stringify(body),
     });
   }
   // DELETE 요청 편의 메서드
-  public async delete<T = any>(url: string, headers?: HeadersInit): Promise<T> {
+  public async delete<T = any>(
+    url: string,
+    path: string,
+    headers?: HeadersInit
+  ): Promise<T> {
     return this.request<T>({
       url,
+      path,
       method: DELETE,
       headers,
     });

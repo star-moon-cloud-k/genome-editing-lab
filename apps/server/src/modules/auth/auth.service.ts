@@ -14,6 +14,7 @@ import {
 import { REFRESH } from '@root/common/const/cache-key.const';
 import {
   ENV_JWT_EXPIRATION_TIME,
+  ENV_JWT_REFRESH_EXPIRATION_TIME,
   ENV_JWT_REFRESH_SECRET_KEY,
   ENV_JWT_SECRET_KEY,
 } from '@root/common/const/env-keys.const';
@@ -59,13 +60,15 @@ export class AuthService {
     };
     return this.jwtService.sign(payload, {
       secret: this.configService.get<string>(ENV_JWT_REFRESH_SECRET_KEY),
-      expiresIn: this.configService.get<string>(ENV_JWT_EXPIRATION_TIME),
+      expiresIn: this.configService.get<string>(
+        ENV_JWT_REFRESH_EXPIRATION_TIME,
+      ),
     } as JwtSignOptions);
   }
   //!SECTION
 
   async tokenValidateUser(payload: any) {
-    return await this.userService.findOne(payload.sub);
+    return await this.userService.findOne(parseInt(payload.sub));
   }
 
   async verifyAccessToken(token: string): Promise<TokenPayload> {

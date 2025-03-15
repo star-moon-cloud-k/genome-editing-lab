@@ -7,7 +7,6 @@ const protectedRoutes = ["/admin", "/admin/user", "/admin/stock"];
 export function middleware(request: NextRequest) {
   const accessToken = request.cookies.get("accessToken")?.value;
 
-  console.log(`middleware : ${accessToken}`);
   const { pathname } = request.nextUrl;
 
   // ✅ `auth` 관련 경로 (로그인, 회원가입 등)

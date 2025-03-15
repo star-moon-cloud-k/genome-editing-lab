@@ -4,6 +4,7 @@ import {
   Controller,
   Get,
   Post,
+  Req,
   Res,
   UnauthorizedException,
   UseGuards,
@@ -17,7 +18,7 @@ import {
   UserLoginReq,
 } from '@root/modules/auth/common/auth.dto';
 import { BEARER } from '@utils/api/fetch.type';
-import { Response } from 'express';
+import { Request, Response } from 'express';
 import { JwtAuthGuard } from './guard/jwt.guard';
 import { RoleGuard } from '@root/common/guard/roles.guard';
 import { CurrentUser } from '@root/common/decorator/user.decorator';
@@ -30,11 +31,6 @@ export class AuthController {
     private readonly configService: ConfigService,
   ) {}
 
-  @Get()
-  @UseGuards(JwtAuthGuard)
-  async checkPermission(@CurrentUser() user: UserType, @Res() res: Response) {
-    return res.status(200).json({ permission: user.role });
-  }
   @Post('/login')
   async login(@Body() payload: UserLoginReq, @Res() res: Response) {
     const user = await this.authService.validateUser(
@@ -65,14 +61,22 @@ export class AuthController {
     });
 
     res.setHeader('Authorization', `${BEARER}${accessToken}`);
-    console.log('what');
     return res.status(200).json({ permission: user.role, ok: true });
   }
 
   @Post('/refresh-token')
-  async generateToken(@Body() payload: RefreshTokenReq) {
-    const token = atob(payload.accessToken);
-    const decodedAccessToken = await this.authService.decodeAccessToken(token);
+  async generateToken(@Req() req: Request, @Res() res: Response) {
+    const accessToken = req?.cookies?.accessToken;
+    const refreshToken = req?.cookies?.refreshToken;
+
+    if (!accessToken || !refreshToken) {
+      throw new BadRequestException('in valid request');
+    }
+
+    console.log(`passs`);
+    // const token = atob(accessToken);
+    const decodedAccessToken =
+      await this.authService.getTokenPayload(accessToken);
     const now = Math.floor(Date.now() / 1000);
 
     if (
@@ -80,20 +84,37 @@ export class AuthController {
       decodedAccessToken.exp < now
     ) {
       const decodedRefreshToken =
-        await this.authService.decodeAccessToken(token);
+        await this.authService.getTokenPayload(refreshToken);
+      console.log(decodedRefreshToken);
+      console.log(now);
 
       if (
         decodedRefreshToken.type === TokeType.REFRESH &&
         decodedRefreshToken.exp > now
       ) {
-        await this.authService.verifyRefreshToken(payload.refreshToken);
-        const accessToken = await this.authService.generateAccessToken(
+        const newAccessToken = await this.authService.generateAccessToken(
           decodedAccessToken.sub,
         );
-        const refreshToken = await this.authService.generateRefreshToken(
+        const newRefreshToken = await this.authService.generateRefreshToken(
           decodedAccessToken.sub,
         );
-        return { accessToken, refreshToken };
+        console.log(`2${decodedAccessToken}`);
+        console.log(`----------------${newAccessToken}-----------`);
+        // ✅ 쿠키에 저장 (httpOnly + secure 설정)
+        res.cookie('accessToken', newAccessToken, {
+          httpOnly: true, // XSS 공격 방어
+          // secure: process.env.NODE_ENV === 'production', // HTTPS 환경에서만 사용
+          sameSite: 'strict', // CSRF 방어
+          maxAge: 1000 * 60 * 60, // 1시간 유효
+        });
+
+        res.cookie('refreshToken', newRefreshToken, {
+          httpOnly: true,
+          // secure: process.env.NODE_ENV === 'production',
+          sameSite: 'strict',
+          maxAge: 1000 * 60 * 60 * 24 * 7, // 7일 유효
+        });
+        return res.status(200).json({ ok: true });
       }
     } else {
       throw new BadRequestException('invalid token');

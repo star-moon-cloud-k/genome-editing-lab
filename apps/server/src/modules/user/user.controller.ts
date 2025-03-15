@@ -7,10 +7,16 @@ import {
   Param,
   Patch,
   Post,
+  Res,
+  UseGuards,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { AuthService } from '../auth/auth.service';
 import { CreateUserReq } from '@shared/users/users.dto';
+import { JwtAuthGuard } from '../auth/guard/jwt.guard';
+import { CurrentUser } from '@root/common/decorator/user.decorator';
+import { UserType } from 'apps/server/dist/apps/server/src/apps/server/src/modules/user/common/user.dto';
+import { Response } from 'express';
 
 @Controller('api/user')
 export class UserController {
@@ -30,6 +36,13 @@ export class UserController {
     );
 
     return { user, accessToken, refreshToken };
+  }
+
+  @Get('/permission')
+  @UseGuards(JwtAuthGuard)
+  async checkPermission(@CurrentUser() user: UserType, @Res() res: Response) {
+    console.log(user);
+    return res.status(200).json({ permission: user.role });
   }
 
   @Get()
