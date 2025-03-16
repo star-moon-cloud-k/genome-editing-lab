@@ -1,6 +1,12 @@
 "use client";
 import * as React from "react";
 
+import { API } from "@/env/env.config";
+import {
+  contact as contactData,
+  register as viewData,
+} from "@config/layout.json";
+import { CreateUserReq } from "@shared/users/users.dto";
 import { Button } from "@workspace/ui/components/button";
 import {
   Card,
@@ -12,14 +18,11 @@ import {
 } from "@workspace/ui/components/card";
 import { Input } from "@workspace/ui/components/input";
 import { Label } from "@workspace/ui/components/label";
-import { FlaskConicalOff } from "lucide-react";
-import {
-  register as viewData,
-  contact as contactData,
-} from "@config/layout.json";
-import { useRouter } from "next/navigation";
+import ApiClient from "@workspace/utils/api/fetch.util";
 import { ID_PATTERN, PASSWORD_PATTERN } from "@workspace/utils/regex-pattern";
-import { Combobox, ComboBoxTypes } from "../../../components/combo-box";
+import { useRouter } from "next/navigation";
+import { Combobox } from "../../../components/combo-box";
+import { useUserStore } from "@state/userStore";
 
 export function RegisterForm() {
   const router = useRouter();
@@ -29,6 +32,8 @@ export function RegisterForm() {
 
   const [open, setOpen] = React.useState(false);
   const [labName, setLabName] = React.useState("");
+
+  const { setPermission } = useUserStore();
 
   console.log({ id });
   console.log({ password });
@@ -58,7 +63,24 @@ export function RegisterForm() {
   ];
 
   const isFilled = id.length > 0 && password.length > 0;
-  const registerHandler = (e: React.FormEvent<HTMLFormElement>) => {
+
+  async function handleRegister() {
+    const user = new CreateUserReq();
+    Object.assign(user, {
+      password,
+      passwordCheck,
+      studentNumber: id,
+      labId: 1,
+    });
+
+    try {
+      return await ApiClient.post(`${API}`, `/api/user`, user);
+    } catch (error) {
+      console.warn(error);
+    }
+  }
+
+  const registerHandler = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault(); //폼 submit의 기본 동작(페이지 새로고침) 방치
 
     //1) ID 정규식 검사
@@ -81,7 +103,12 @@ export function RegisterForm() {
       alert("비밀번호 정책과 일치하지 않습니다.");
     }
 
-    alert("비밀번호 정책과 일치합니다.");
+    const response = await handleRegister();
+    if (response) {
+      setPermission(response.permission);
+      router.refresh();
+      router.push("/");
+    }
   };
   return (
     <Card className="w-11/12 mt-5">

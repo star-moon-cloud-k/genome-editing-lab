@@ -17,6 +17,9 @@ importers:
       zod:
         specifier: ^3.23.8
         version: 3.24.2
+      zustand:
+        specifier: ^5.0.3
+        version: 5.0.3(@types/react@18.3.0)(react@19.0.0)
     devDependencies:
       '@workspace/eslint-config':
         specifier: workspace:*
@@ -120,7 +123,7 @@ importers:
     devDependencies:
       '@nestjs/cli':
         specifier: ^10.0.0
-        version: 10.4.9(esbuild@0.25.0)
+        version: 10.4.9
       '@nestjs/schematics':
         specifier: ^10.0.0
         version: 10.2.3(chokidar@3.6.0)(typescript@5.8.2)
@@ -177,10 +180,10 @@ importers:
         version: 6.3.4
       ts-jest:
         specifier: ^29.1.0
-        version: 29.2.6(@babel/core@7.26.9)(@jest/transform@29.7.0)(@jest/types@29.6.3)(babel-jest@29.7.0(@babel/core@7.26.9))(esbuild@0.25.0)(jest@29.7.0(@types/node@20.17.22)(ts-node@10.9.2(@types/node@20.17.22)(typescript@5.8.2)))(typescript@5.8.2)
+        version: 29.2.6(@babel/core@7.26.9)(@jest/transform@29.7.0)(@jest/types@29.6.3)(babel-jest@29.7.0(@babel/core@7.26.9))(jest@29.7.0(@types/node@20.17.22)(ts-node@10.9.2(@types/node@20.17.22)(typescript@5.8.2)))(typescript@5.8.2)
       ts-loader:
         specifier: ^9.4.3
-        version: 9.5.2(typescript@5.8.2)(webpack@5.97.1(esbuild@0.25.0))
+        version: 9.5.2(typescript@5.8.2)(webpack@5.97.1)
       ts-node:
         specifier: ^10.9.1
         version: 10.9.2(@types/node@20.17.22)(typescript@5.8.2)
@@ -5672,6 +5675,24 @@ packages:
   zod@3.24.2:
     resolution: {integrity: sha512-lY7CDW43ECgW9u1TcT3IoXHflywfVqDYze4waEz812jR/bZ8FHDsl7pFQoSZTz5N+2NqRXs8GBwnAwo3ZNxqhQ==}
 
+  zustand@5.0.3:
+    resolution: {integrity: sha512-14fwWQtU3pH4dE0dOpdMiWjddcH+QzKIgk1cl8epwSE7yag43k/AD/m4L6+K7DytAOr9gGBe3/EXj9g7cdostg==}
+    engines: {node: '>=12.20.0'}
+    peerDependencies:
+      '@types/react': '>=18.0.0'
+      immer: '>=9.0.6'
+      react: '>=18.0.0'
+      use-sync-external-store: '>=1.2.0'
+    peerDependenciesMeta:
+      '@types/react':
+        optional: true
+      immer:
+        optional: true
+      react:
+        optional: true
+      use-sync-external-store:
+        optional: true
+
 snapshots:
 
   '@alloc/quick-lru@5.2.0': {}
@@ -6387,7 +6408,7 @@ snapshots:
       '@nestjs/common': 10.4.15(reflect-metadata@0.2.2)(rxjs@7.8.2)
       '@nestjs/core': 10.4.15(@nestjs/common@10.4.15(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/platform-express@10.4.15)(reflect-metadata@0.2.2)(rxjs@7.8.2)
 
-  '@nestjs/cli@10.4.9(esbuild@0.25.0)':
+  '@nestjs/cli@10.4.9':
     dependencies:
       '@angular-devkit/core': 17.3.11(chokidar@3.6.0)
       '@angular-devkit/schematics': 17.3.11(chokidar@3.6.0)
@@ -6397,7 +6418,7 @@ snapshots:
       chokidar: 3.6.0
       cli-table3: 0.6.5
       commander: 4.1.1
-      fork-ts-checker-webpack-plugin: 9.0.2(typescript@5.7.2)(webpack@5.97.1(esbuild@0.25.0))
+      fork-ts-checker-webpack-plugin: 9.0.2(typescript@5.7.2)(webpack@5.97.1)
       glob: 10.4.5
       inquirer: 8.2.6
       node-emoji: 1.11.0
@@ -6406,7 +6427,7 @@ snapshots:
       tsconfig-paths: 4.2.0
       tsconfig-paths-webpack-plugin: 4.2.0
       typescript: 5.7.2
-      webpack: 5.97.1(esbuild@0.25.0)
+      webpack: 5.97.1
       webpack-node-externals: 3.0.0
     transitivePeerDependencies:
       - esbuild
@@ -8795,7 +8816,7 @@ snapshots:
       cross-spawn: 7.0.6
       signal-exit: 4.1.0
 
-  fork-ts-checker-webpack-plugin@9.0.2(typescript@5.7.2)(webpack@5.97.1(esbuild@0.25.0)):
+  fork-ts-checker-webpack-plugin@9.0.2(typescript@5.7.2)(webpack@5.97.1):
     dependencies:
       '@babel/code-frame': 7.26.2
       chalk: 4.1.2
@@ -8810,7 +8831,7 @@ snapshots:
       semver: 7.7.1
       tapable: 2.2.1
       typescript: 5.7.2
-      webpack: 5.97.1(esbuild@0.25.0)
+      webpack: 5.97.1
 
   form-data@4.0.2:
     dependencies:
@@ -11186,16 +11207,14 @@ snapshots:
       mkdirp: 1.0.4
       yallist: 4.0.0
 
-  terser-webpack-plugin@5.3.12(esbuild@0.25.0)(webpack@5.97.1(esbuild@0.25.0)):
+  terser-webpack-plugin@5.3.12(webpack@5.97.1):
     dependencies:
       '@jridgewell/trace-mapping': 0.3.25
       jest-worker: 27.5.1
       schema-utils: 4.3.0
       serialize-javascript: 6.0.2
       terser: 5.39.0
-      webpack: 5.97.1(esbuild@0.25.0)
-    optionalDependencies:
-      esbuild: 0.25.0
+      webpack: 5.97.1
 
   terser@5.39.0:
     dependencies:
@@ -11262,7 +11281,7 @@ snapshots:
 
   ts-interface-checker@0.1.13: {}
 
-  ts-jest@29.2.6(@babel/core@7.26.9)(@jest/transform@29.7.0)(@jest/types@29.6.3)(babel-jest@29.7.0(@babel/core@7.26.9))(esbuild@0.25.0)(jest@29.7.0(@types/node@20.17.22)(ts-node@10.9.2(@types/node@20.17.22)(typescript@5.8.2)))(typescript@5.8.2):
+  ts-jest@29.2.6(@babel/core@7.26.9)(@jest/transform@29.7.0)(@jest/types@29.6.3)(babel-jest@29.7.0(@babel/core@7.26.9))(jest@29.7.0(@types/node@20.17.22)(ts-node@10.9.2(@types/node@20.17.22)(typescript@5.8.2)))(typescript@5.8.2):
     dependencies:
       bs-logger: 0.2.6
       ejs: 3.1.10
@@ -11280,9 +11299,8 @@ snapshots:
       '@jest/transform': 29.7.0
       '@jest/types': 29.6.3
       babel-jest: 29.7.0(@babel/core@7.26.9)
-      esbuild: 0.25.0
 
-  ts-loader@9.5.2(typescript@5.8.2)(webpack@5.97.1(esbuild@0.25.0)):
+  ts-loader@9.5.2(typescript@5.8.2)(webpack@5.97.1):
     dependencies:
       chalk: 4.1.2
       enhanced-resolve: 5.18.1
@@ -11290,7 +11308,7 @@ snapshots:
       semver: 7.7.1
       source-map: 0.7.4
       typescript: 5.8.2
-      webpack: 5.97.1(esbuild@0.25.0)
+      webpack: 5.97.1
 
   ts-node@10.9.2(@types/node@20.17.22)(typescript@5.8.2):
     dependencies:
@@ -11538,7 +11556,7 @@ snapshots:
 
   webpack-sources@3.2.3: {}
 
-  webpack@5.97.1(esbuild@0.25.0):
+  webpack@5.97.1:
     dependencies:
       '@types/eslint-scope': 3.7.7
       '@types/estree': 1.0.6
@@ -11560,7 +11578,7 @@ snapshots:
       neo-async: 2.6.2
       schema-utils: 3.3.0
       tapable: 2.2.1
-      terser-webpack-plugin: 5.3.12(esbuild@0.25.0)(webpack@5.97.1(esbuild@0.25.0))
+      terser-webpack-plugin: 5.3.12(webpack@5.97.1)
       watchpack: 2.4.2
       webpack-sources: 3.2.3
     transitivePeerDependencies:
@@ -11705,3 +11723,8 @@ snapshots:
   yocto-queue@0.1.0: {}
 
   zod@3.24.2: {}
+
+  zustand@5.0.3(@types/react@18.3.0)(react@19.0.0):
+    optionalDependencies:
+      '@types/react': 18.3.0
+      react: 19.0.0
